@@ -47,3 +47,29 @@
     border-color: white;
   }
   
+  * {
+    box-sizing: border-box;
+    margin:0;
+    padding: 0;
+  }
+
+  #root {
+    height: 100vh;
+  }
+
+  .leaflet-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;
+  }
+
+  .overlay {
+    position: absolute;
+    top: 10px;  /* Adjust as needed */
+    left: 50px; /* Adjust as needed */
+    z-index: 1000; /* Ensure it's above the map */
+    /* background: rgba(255, 255, 255, 0.8); */
+    /* padding: 10px; */
+    /* border-radius: 5px; */
+  }

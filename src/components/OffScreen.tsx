@@ -6,7 +6,7 @@ const OffScreen = ({ onClose }: Props) => {
   return (
     <>
       <div
-        className="offcanvas offcanvas-start show"
+        className="offcanvas offcanvas-start show bg-secondary"
         tabIndex={-1}
         id="offcanvas"
         aria-labelledby="offcanvasLabel"
