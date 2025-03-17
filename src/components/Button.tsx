@@ -1,13 +1,23 @@
+import { IconType } from "react-icons";
+
 interface Props {
-  children: string;
+  icon: IconType;
   onClick: () => void;
-  color?: string;
 }
 
-const Button = ({ children, onClick, color = "primary" }: Props) => {
+const Button = ({ icon: Icon, onClick }: Props) => {
   return (
-    <button className={"btn btn-" + color} onClick={onClick}>
-      {children}
+    <button
+      onClick={onClick}
+      style={{
+        padding: "8px",
+        border: "none",
+        backgroundColor: "transparent",
+        cursor: "pointer",
+        borderRadius: "50%",
+      }}
+    >
+      <Icon size={50} />
     </button>
   );
 };
