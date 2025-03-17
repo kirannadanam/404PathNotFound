@@ -1,31 +1,76 @@
+import { useState } from "react";
+import ListGroup from "./ListGroup";
+import { FaMapLocationDot } from "react-icons/fa6";
+import { PiPathBold } from "react-icons/pi";
+
 interface Props {
   onClose: () => void;
 }
 
 const OffScreen = ({ onClose }: Props) => {
+  let methods = ["Dijkstra's", "BFS", "DFS"];
+  const [selectedMethod, setSelectedMethod] = useState<String | null>(null);
+
+  const handleSelectItem = (item: string) => {
+    setSelectedMethod(item);
+  };
+
   return (
     <>
       <div
-        className="offcanvas offcanvas-start show bg-secondary"
+        className="offcanvas offcanvas-start show bg-dark"
         tabIndex={-1}
         id="offcanvas"
         aria-labelledby="offcanvasLabel"
       >
         <div className="offcanvas-header">
-          <h5 className="offcanvas-title" id="offcanvasLabel">
-            Offcanvas
+          <h5 className="offcanvas-title text-light" id="offcanvasLabel">
+            404: Path Not Found!
           </h5>
           <button
             type="button"
-            className="btn-close"
+            className="btn-close btn-close-white"
             data-bs-dismiss="offcanvas"
             aria-label="Close"
             onClick={onClose}
           ></button>
         </div>
-        <div className="offcanvas-body">
-          Content for the offcanvas goes here. You can place just about any
-          Bootstrap component or custom elements here.
+        <div className="offcanvas-body text-light">
+          <>
+            <ListGroup
+              items={methods}
+              heading={"Search Methods"}
+              onSelectItem={() => handleSelectItem}
+            ></ListGroup>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                border: "4px solid white",
+                marginTop: "20px",
+                background: "#212529",
+                borderRadius: "5px",
+              }}
+            >
+              <FaMapLocationDot />
+              <h6 style={{ margin: 10 }}>Start Location:</h6>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                border: "4px solid white",
+                marginTop: "10px",
+                background: "#212529",
+                borderRadius: "5px",
+              }}
+            >
+              <PiPathBold />
+              <h6 style={{ margin: 10 }}>End Location:</h6>
+            </div>
+          </>
         </div>
       </div>
     </>
