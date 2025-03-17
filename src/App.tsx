@@ -38,9 +38,16 @@ function App() {
   // markers
   const [markers, setMarker] = useState<LatLngExpression[]>([]);
 
-  const customIcon = new Icon({
+  const destinationIcon = new Icon({
     iconUrl: "./public/placeholder.png",
     iconSize: [40, 40],
+    iconAnchor: [20, 40],
+  });
+
+  const homeIcon = new Icon({
+    iconUrl: "./public/home.png",
+    iconSize: [40, 40],
+    iconAnchor: [20, 40],
   });
 
   const center: [number, number] = [37.925832, -96.835365];
@@ -65,7 +72,7 @@ function App() {
             <Marker
               key={index}
               position={position}
-              icon={customIcon}
+              icon={index === 0 ? homeIcon : destinationIcon}
               eventHandlers={{
                 click: () =>
                   setMarker((prev) => prev.filter((_, i) => i !== index)),
