@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import OffScreen from "./components/OffScreen.tsx";
 import Button from "./components/Button.tsx";
@@ -7,7 +7,13 @@ import "./App.css";
 
 import { BsCaretRightFill } from "react-icons/bs";
 
-import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  useMapEvents,
+  Polyline,
+} from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { Icon, LatLngExpression } from "leaflet";
 
@@ -37,6 +43,7 @@ function HandleClick({
 function App() {
   // markers
   const [markers, setMarker] = useState<LatLngExpression[]>([]);
+  const [shortestPath, setShortestPath] = useState<LatLngExpression[]>([]);
 
   const destinationIcon = new Icon({
     iconUrl: "./public/placeholder.png",
@@ -52,6 +59,40 @@ function App() {
 
   const center: [number, number] = [37.925832, -96.835365];
   const [offScreenVisible, setOSVisibility] = useState(true);
+
+  // when there are two markers, find the shortest path
+  useEffect(() => {
+    if (markers.length === 2) {
+      fetchShortestPath();
+    }
+  }, [markers]);
+
+  // make the function that finds the shortest path
+  const fetchShortestPath = async () => {
+    // if no two markers, stop
+    if (markers.length < 2) return;
+
+    //get the data request from python file
+    try {
+      const response = await fetch("http://127.0.0.1:5000/shortest-path", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ point1: markers[0], point2: markers[1] }),
+      });
+
+      // set the shortest path to the given path
+      const data = await response.json();
+      console.log("Received Path from Flask:", data.path); // Debugging log
+
+      if (data.path) {
+        setShortestPath(data.path);
+        markers[0] = data.path[0];
+        markers[1] = data.path[data.path.length - 1];
+      }
+    } catch (error) {
+      console.error("Error fetching shortest path:", error);
+    }
+  };
 
   return (
     <>
@@ -83,6 +124,11 @@ function App() {
             </a>
           </>
         ))}
+
+        {/* draw the shortest path */}
+        {shortestPath.length > 0 && markers.length === 2 && (
+          <Polyline positions={shortestPath} color="blue" weight={5} />
+        )}
       </MapContainer>
 
       <div className="overlay">
