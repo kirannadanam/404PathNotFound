@@ -13,6 +13,7 @@ import {
   Marker,
   useMapEvents,
   Polyline,
+  Rectangle,
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { Icon, LatLngExpression } from "leaflet";
@@ -45,6 +46,11 @@ function App() {
   const [markers, setMarker] = useState<LatLngExpression[]>([]);
   const [shortestPath, setShortestPath] = useState<LatLngExpression[]>([]);
 
+  const searchBounds: [[number, number], [number, number]] = [
+    [29.204, -83.104], // SW
+    [30.048, -81.605], // NE corner (lat, lon)
+  ];
+
   const destinationIcon = new Icon({
     iconUrl: "./public/placeholder.png",
     iconSize: [40, 40],
@@ -57,13 +63,15 @@ function App() {
     iconAnchor: [20, 40],
   });
 
-  const center: [number, number] = [37.925832, -96.835365];
+  const center: [number, number] = [29.622069801647613, -82.62269247880934];
   const [offScreenVisible, setOSVisibility] = useState(true);
 
   // when there are two markers, find the shortest path
   useEffect(() => {
     if (markers.length === 2) {
       fetchShortestPath();
+    } else {
+      setShortestPath([]);
     }
   }, [markers]);
 
@@ -98,7 +106,7 @@ function App() {
     <>
       <MapContainer
         center={center}
-        zoom={5}
+        zoom={10}
         style={{ height: "100%", width: "100%" }}
       >
         <TileLayer
@@ -107,6 +115,11 @@ function App() {
         />
 
         <HandleClick markers={markers} setMarker={setMarker} />
+
+        <Rectangle
+          bounds={searchBounds}
+          pathOptions={{ color: "gray", weight: 2, fillOpacity: 0 }}
+        ></Rectangle>
 
         {markers.map((position, index) => (
           <>
@@ -133,7 +146,11 @@ function App() {
 
       <div className="overlay">
         {offScreenVisible ? (
-          <OffScreen onClose={() => setOSVisibility(false)} />
+          <OffScreen
+            destination={[markers[1]]}
+            start={[markers[0]]}
+            onClose={() => setOSVisibility(false)}
+          />
         ) : (
           <Button
             icon={BsCaretRightFill}

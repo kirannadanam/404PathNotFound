@@ -2,12 +2,15 @@ import { useState } from "react";
 import ListGroup from "./ListGroup";
 import { FaMapLocationDot } from "react-icons/fa6";
 import { PiPathBold } from "react-icons/pi";
+import { LatLngExpression } from "leaflet";
 
 interface Props {
   onClose: () => void;
+  start: LatLngExpression[];
+  destination: LatLngExpression[];
 }
 
-const OffScreen = ({ onClose }: Props) => {
+const OffScreen = ({ start, destination, onClose }: Props) => {
   let methods = ["Dijkstra's", "BFS", "DFS"];
   const [selectedMethod, setSelectedMethod] = useState<String | null>(null);
 
@@ -54,7 +57,9 @@ const OffScreen = ({ onClose }: Props) => {
               }}
             >
               <FaMapLocationDot />
-              <h6 style={{ margin: 10 }}>Start Location:</h6>
+              <h6 style={{ margin: 10 }}>
+                Start Location: {start[0] ? `${start[0]}` : "N/A"}
+              </h6>
             </div>
             <div
               style={{
@@ -68,7 +73,9 @@ const OffScreen = ({ onClose }: Props) => {
               }}
             >
               <PiPathBold />
-              <h6 style={{ margin: 10 }}>End Location:</h6>
+              <h6 style={{ margin: 10 }}>
+                Destination: {destination[0] ? `${destination[0]}` : "N/A"}
+              </h6>
             </div>
           </>
         </div>

@@ -58,16 +58,44 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import networkx as nx
 import geopandas as gpd
+import pandas as pd
+import numpy as np
 from shapely.geometry import LineString, Point
 from scipy.spatial import KDTree
 
 app = Flask(__name__)
 CORS(app)
 
-# Load the road shapefile
-shapefile_path = "./public/roads.shp"
-gdf = gpd.read_file(shapefile_path)
+print("connection established")
 
+# Load the road gainesville shapefile
+gainesville_shapefile_path = "./public/Gainesville/BetterGainesville.shp"
+gdf = gpd.read_file(gainesville_shapefile_path)
+
+
+# Load the road south florida shapefiles
+# southFL_shapefile_paths = [
+#     "./public/South_Florida/FL1.shp",
+#     "./public/South_Florida/FL2_1.shp",
+#     "./public/South_Florida/FL2_2.shp",
+#     "./public/South_Florida/FL3.shp",
+#     "./public/South_Florida/FL4.shp",
+#     "./public/South_Florida/FL5.shp",
+#     "./public/South_Florida/FL6.shp"
+# ]
+# gdf_list = []
+# for path in southFL_shapefile_paths:
+#     gdf = gpd.read_file(path)
+    
+#     if gdf.crs is None:
+#         gdf.set_crs("EPSG:4326", allow_override=True, inplace=True)
+#     else:
+#         if gdf.crs != "EPSG:4326":
+#             gdf = gdf.to_crs(epsg=4326)
+#     gdf_list.append(gdf)
+
+# gdf = gpd.GeoDataFrame(pd.concat(gdf_list, ignore_index=True))
+# gdf = gdf.drop_duplicates(subset='geometry', keep='first')
 
 # for seeing data
 print(gdf.head())  
@@ -80,25 +108,63 @@ if gdf.crs is None:
     gdf.set_crs(epsg=4326, inplace=True)
 gdf = gdf.to_crs(epsg=4326)
 
+# # Create an empty NetworkX graph
+# G = nx.Graph()
+
+# # Extract road segment endpoints and add to graph
+# nodes = set()
+# edges = []
+
+# for _, row in gdf.iterrows():
+#     if isinstance(row.geometry, LineString):
+#         coords = list(row.geometry.coords)
+#         for i in range(len(coords) - 1):
+#             node1, node2 = tuple(coords[i]), tuple(coords[i+1])
+#             nodes.add(node1)
+#             nodes.add(node2)
+#             distance = Point(node1).distance(Point(node2))  # Euclidean distance
+#             G.add_edge(node1, node2, weight=distance)
+
 # Create an empty NetworkX graph
 G = nx.Graph()
 
-# Extract road segment endpoints and add to graph
-nodes = set()
+# Dictionary to store unique nodes with a fast lookup
+node_dict = {}
+
+# List to store edges
 edges = []
 
+# Extract road segment endpoints and add to graph
 for _, row in gdf.iterrows():
     if isinstance(row.geometry, LineString):
-        coords = list(row.geometry.coords)
+        coords = np.array(row.geometry.coords)  # Convert to NumPy array (faster)
+
         for i in range(len(coords) - 1):
             node1, node2 = tuple(coords[i]), tuple(coords[i+1])
-            nodes.add(node1)
-            nodes.add(node2)
-            distance = Point(node1).distance(Point(node2))  # Euclidean distance
-            G.add_edge(node1, node2, weight=distance)
+
+            # Store unique nodes in a dictionary for fast lookups
+            if node1 not in node_dict:
+                node_dict[node1] = node1
+            if node2 not in node_dict:
+                node_dict[node2] = node2
+
+            # Compute Euclidean distance (faster than shapely Point.distance)
+            distance = np.linalg.norm(np.array(node1) - np.array(node2))
+
+            # Append edge to list
+            edges.append((node1, node2, distance))
+
+# Add all nodes in batch
+G.add_nodes_from(node_dict.keys())
+
+# Add all edges in batch
+G.add_weighted_edges_from(edges)
+
+print(f"Graph created with {len(G.nodes)} nodes and {len(G.edges)} edges.")
+
 
 # Convert node list to KDTree for fast nearest neighbor lookup
-node_list = list(nodes)
+node_list = list(node_dict.keys())
 kdtree = KDTree(node_list)
 
 def find_nearest_node(point):
