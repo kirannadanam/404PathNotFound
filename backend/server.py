@@ -64,7 +64,7 @@ from shapely.geometry import LineString, Point
 from scipy.spatial import KDTree
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, supports_credentials=True)
 
 print("connection established")
 
@@ -179,32 +179,140 @@ def find_nearest_node(point):
 def home():
     return "flask works happy times"
 
-@app.route("/shortest-path", methods=["POST"])
-def shortest_path():
+#This is a test function to see how the methods would plot on the graph using networkx
+# def shortest_path():
+#     try:
+#         data = request.json
+#         point1 = tuple(data["point1"])
+#         point2 = tuple(data["point2"])
+
+#         # Find nearest nodes
+#         node1 = find_nearest_node(Point(point1[1], point1[0]))
+#         node2 = find_nearest_node(Point(point2[1], point2[0]))
+
+#         print(f"Nearest nodes: {node1} and {node2}")  # Debugging log
+
+#         # Compute shortest path
+#         path = nx.shortest_path(G, node1, node2, weight="weight")
+
+#         print(f"Shortest path: {path}")  # Debugging log
+
+#         # Convert path nodes to lat/lon
+#         path_coords = [[p[1], p[0]] for p in path]  # Convert to [lat, lon]
+
+#         return jsonify({"path": path_coords})
+
+#     except Exception as e:
+#         print("Error:", str(e))  # Debugging log
+#         return jsonify({"error": str(e)}), 500
+    
+#DIJKSTRAS IMPLEMENTATION WITH LIST AND NO HEAP
+# def dijkstras():
+#     try:
+#         data = request.json
+#         point1 = tuple(data["point1"])
+#         point2 = tuple(data["point2"])
+#         node1 = find_nearest_node(Point(point1[1], point1[0]))
+#         node2 = find_nearest_node(Point(point2[1], point2[0]))
+#         #initialize a dictionary to ensure that: 
+#         #for all vertexes in the graph G, dist[v]=infinity and prev[v] = None (or undefined)
+#         #change distance of start to 0 and create a list of unvisited nodes using all the vertexes in graph G
+#         distances = {node: float('inf') for node in G.nodes()}
+#         previous_nodes = {node: None for node in G.nodes()}
+#         distances[node1] = 0
+#         unvisited_nodes = list(G.nodes())
+#         #While there are still destinations unexplored, set the current node to be the smallest distance
+#         #set the current node to explored, meaning take it out of the list
+#         #then at the end update each of the distances from the start to a given node
+#         #if the distance to any of the nodes to the start is smaller than the previous expected, change the distance and the previous node to the current node
+#         #NOTE this can be done with a minheap to make it faster, but it is slightly more complex
+#         while unvisited_nodes:
+#             current_node = min(unvisited_nodes, key=lambda node: distances[node])
+
+#             if current_node == node2:
+#                 path = []
+#                 while previous_nodes[current_node] is not None:
+#                     path.append(current_node)
+#                     current_node = previous_nodes[current_node]
+#                 path.append(node1)
+#                 path.reverse()
+
+#                 # Convert the path nodes to lat/lon
+#                 path_coords = [[p[1], p[0]] for p in path]
+#                 return jsonify({"path": path_coords})
+
+#             # Remove current node from unvisited list
+#             unvisited_nodes.remove(current_node)
+
+#             # Update distances to neighbors
+#             for neighbor in G.neighbors(current_node):
+#                 weight = G[current_node][neighbor]['weight']
+#                 new_distance = distances[current_node] + weight
+#                 if new_distance < distances[neighbor]:
+#                     distances[neighbor] = new_distance
+#                     previous_nodes[neighbor] = current_node
+
+#         return jsonify({"error": "No path found"}), 404
+
+#     except Exception as e:
+#         print("Error:", str(e))  # Debugging log
+#         return jsonify({"error": str(e)}), 500
+# 
+import heapq 
+@app.route("/dijkstras", methods=["POST"])
+def dijkstras():
     try:
         data = request.json
         point1 = tuple(data["point1"])
         point2 = tuple(data["point2"])
 
-        # Find nearest nodes
         node1 = find_nearest_node(Point(point1[1], point1[0]))
         node2 = find_nearest_node(Point(point2[1], point2[0]))
 
-        print(f"Nearest nodes: {node1} and {node2}")  # Debugging log
+        #Initialize distances to all nodes as infinity but the start node like before
+        distances = {node: float('inf') for node in G.nodes()}
+        previous_nodes = {node: None for node in G.nodes()}
+        distances[node1] = 0
 
-        # Compute shortest path
-        path = nx.shortest_path(G, node1, node2, weight="weight")
+        # Min-heap stores nodes based on shortest distance
+        heap = [(0, node1)]  # (distance, node)
 
-        print(f"Shortest path: {path}")  # Debugging log
+        while heap:
+            #Extract the node with the smallest current distance
+            current_distance, current_node = heapq.heappop(heap)
+            #If the target end is reached, reconstruct the path like before
+            if current_node == node2:
+                path = []
+                while current_node is not None:
+                    path.append(current_node)
+                    current_node = previous_nodes[current_node]
+                path.reverse()
 
-        # Convert path nodes to lat/lon
-        path_coords = [[p[1], p[0]] for p in path]  # Convert to [lat, lon]
+                # Convert path nodes to lat/lon like before
+                path_coords = [[p[1], p[0]] for p in path]
+                return jsonify({"path": path_coords})
 
-        return jsonify({"path": path_coords})
+            # If the current distance is greater than the recorded one, skip processing
+            if current_distance > distances[current_node]:
+                continue
+            #For each of the neighbors to the current node, update the distances if a shorter path presents itself
+            #like before
+            for neighbor in G.neighbors(current_node):
+                weight = G[current_node][neighbor]['weight']
+                new_distance = current_distance + weight
+
+                if new_distance < distances[neighbor]:
+                    distances[neighbor] = new_distance
+                    previous_nodes[neighbor] = current_node
+                    heapq.heappush(heap, (new_distance, neighbor))
+
+        return jsonify({"error": "No path found"}), 404
 
     except Exception as e:
         print("Error:", str(e))  # Debugging log
         return jsonify({"error": str(e)}), 500
-
+    #NOTE the min-heap method performs far better,
+    #the original method uses O(N^2) where N is the number of nodes because of curr_node = min(unvisited, node: distances)
+    #the new one is much faster in that regard. With the first method 1 million nodes would take 1 trillion operations. Not happening.
 if __name__ == "__main__":
     app.run(debug=True)

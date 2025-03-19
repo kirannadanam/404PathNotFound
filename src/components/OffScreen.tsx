@@ -12,7 +12,7 @@ interface Props {
 
 const OffScreen = ({ start, destination, onClose }: Props) => {
   let methods = ["Dijkstra's", "BFS", "DFS"];
-  const [selectedMethod, setSelectedMethod] = useState<String | null>(null);
+  const [selectedMethod, setSelectedMethod] = useState<string>("Dijkstra's");
 
   const handleSelectItem = (item: string) => {
     setSelectedMethod(item);
