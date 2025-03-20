@@ -68,12 +68,15 @@ function App() {
 
   const [executionTime, setExecutionTime] = useState<string | null>(null);
 
+  const [pathNotFound, setPathNotFound] = useState(false);
+
   // when there are two markers, find the shortest path
   useEffect(() => {
     if (markers.length === 2) {
       fetchShortestPath();
     } else {
       setShortestPath([]);
+      setPathNotFound(false);
     }
   }, [markers]);
 
@@ -98,6 +101,12 @@ function App() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ point1: markers[0], point2: markers[1] }),
       });
+
+      if (response.status === 404) {
+        setPathNotFound(true);
+      } else {
+        setPathNotFound(false);
+      }
 
       const endTime = performance.now();
 
@@ -130,14 +139,19 @@ function App() {
           url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         <TileLayer
-          attribution='<a href="https://www.flaticon.com/free-icons/pin
-">Flaticon Icons</a>'
-          url="https://www.flaticon.com/free-icons/pin"
-        />
-        <TileLayer
           attribution='<a href="https://extract.bbbike.org/extract.html
 ">BBBike</a>'
           url="https://extract.bbbike.org/extract.html"
+        />
+        <TileLayer
+          attribution='<a href="https://www.flaticon.com/free-icons/pin
+">Flaticon</a>'
+          url="https://www.flaticon.com/free-icons/pin"
+        />
+        <TileLayer
+          attribution='<a href="https://www.freepik.com/icons/404
+">FreePik</a>'
+          url="https://www.freepik.com/icons/404"
         />
 
         <HandleClick markers={markers} setMarker={setMarker} />
@@ -176,6 +190,7 @@ function App() {
             executionTime={executionTime}
             numMarkers={numMarkers}
             lengthPath={shortestPath.length}
+            pathNotFound={pathNotFound}
           />
         ) : (
           <Button

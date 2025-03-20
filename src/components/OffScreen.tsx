@@ -13,6 +13,7 @@ interface Props {
   executionTime: string | null;
   numMarkers: number;
   lengthPath: number | 0;
+  pathNotFound: boolean;
 }
 
 const OffScreen = ({
@@ -22,6 +23,7 @@ const OffScreen = ({
   executionTime,
   numMarkers,
   lengthPath,
+  pathNotFound,
 }: Props) => {
   let methods = ["Dijkstra's", "BFS", "DFS"];
   const [selectedMethod, setSelectedMethod] = useState<string>("Dijkstra's");
@@ -37,6 +39,7 @@ const OffScreen = ({
         tabIndex={-1}
         id="offcanvas"
         aria-labelledby="offcanvasLabel"
+        style={{ height: "100vh", display: "flex", flexDirection: "column" }}
       >
         <div className="offcanvas-header">
           <h3 className="offcanvas-title text-light" id="offcanvasLabel">
@@ -103,7 +106,9 @@ const OffScreen = ({
               <MdTimer />
               <h6 style={{ margin: 10 }}>
                 Execution Time:{" "}
-                {executionTime != null && numMarkers == 2
+                {pathNotFound
+                  ? "404: Path Not Found!"
+                  : executionTime != null && numMarkers == 2
                   ? `${executionTime}`
                   : "N/A"}
               </h6>
@@ -122,12 +127,30 @@ const OffScreen = ({
               <GiPathDistance />
               <h6 style={{ margin: 10 }}>
                 Nodes Traveled in Path:{" "}
-                {lengthPath != 0 && numMarkers == 2
+                {pathNotFound
+                  ? "404 ERROR!!!"
+                  : lengthPath != 0 && numMarkers == 2
                   ? `${lengthPath}`
                   : lengthPath === 0 && numMarkers == 2
                   ? "Loading..."
                   : "N/A"}
               </h6>
+            </div>
+
+            <div>
+              <img
+                src={pathNotFound ? "/404active.png" : "/404static.png"}
+                alt="404 Static Image"
+                style={{
+                  position: "fixed", // Fixes the image in place relative to the viewport
+                  top: "86%", // Position it at the center of the screen vertically
+                  left: "26%", // Position it at the center horizontally
+                  width: "210px", // Set the width of the image
+                  height: "250px", // Set the height of the image
+                  objectFit: "contain", // Keep the aspect ratio of the image
+                  transform: "translate(-50%, -50%)", // Offset by 50% of its own width and height to center it
+                }}
+              />
             </div>
           </>
         </div>
