@@ -3,6 +3,7 @@ import ListGroup from "./ListGroup";
 import { FaMapLocationDot } from "react-icons/fa6";
 import { PiPathBold } from "react-icons/pi";
 import { MdTimer } from "react-icons/md";
+import { GiPathDistance } from "react-icons/gi";
 import { LatLngExpression } from "leaflet";
 
 interface Props {
@@ -11,6 +12,7 @@ interface Props {
   destination: LatLngExpression[];
   executionTime: string | null;
   numMarkers: number;
+  lengthPath: number | 0;
 }
 
 const OffScreen = ({
@@ -19,6 +21,7 @@ const OffScreen = ({
   onClose,
   executionTime,
   numMarkers,
+  lengthPath,
 }: Props) => {
   let methods = ["Dijkstra's", "BFS", "DFS"];
   const [selectedMethod, setSelectedMethod] = useState<string>("Dijkstra's");
@@ -102,6 +105,27 @@ const OffScreen = ({
                 Execution Time:{" "}
                 {executionTime != null && numMarkers == 2
                   ? `${executionTime}`
+                  : "N/A"}
+              </h6>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                border: "4px solid white",
+                marginTop: "10px",
+                background: "#212529",
+                borderRadius: "5px",
+              }}
+            >
+              <GiPathDistance />
+              <h6 style={{ margin: 10 }}>
+                Nodes Traveled in Path:{" "}
+                {lengthPath != 0 && numMarkers == 2
+                  ? `${lengthPath}`
+                  : lengthPath === 0 && numMarkers == 2
+                  ? "Loading..."
                   : "N/A"}
               </h6>
             </div>

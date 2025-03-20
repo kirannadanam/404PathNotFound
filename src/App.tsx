@@ -110,6 +110,8 @@ function App() {
         markers[0] = data.path[0];
         markers[1] = data.path[data.path.length - 1];
         setExecutionTime(((endTime - startTime) / 1000).toFixed(3));
+        console.log(data.path);
+        console.log(data.path.length);
       }
     } catch (error) {
       console.error("Error fetching shortest path:", error);
@@ -126,6 +128,16 @@ function App() {
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+        <TileLayer
+          attribution='<a href="https://www.flaticon.com/free-icons/pin
+">Flaticon Icons</a>'
+          url="https://www.flaticon.com/free-icons/pin"
+        />
+        <TileLayer
+          attribution='<a href="https://extract.bbbike.org/extract.html
+">BBBike</a>'
+          url="https://extract.bbbike.org/extract.html"
         />
 
         <HandleClick markers={markers} setMarker={setMarker} />
@@ -146,9 +158,6 @@ function App() {
                   setMarker((prev) => prev.filter((_, i) => i !== index)),
               }}
             ></Marker>
-            <a href="https://www.flaticon.com/free-icons/pin" title="pin icons">
-              Pin icons created by Freepik - Flaticon
-            </a>
           </>
         ))}
 
@@ -166,6 +175,7 @@ function App() {
             onClose={() => setOSVisibility(false)}
             executionTime={executionTime}
             numMarkers={numMarkers}
+            lengthPath={shortestPath.length}
           />
         ) : (
           <Button
