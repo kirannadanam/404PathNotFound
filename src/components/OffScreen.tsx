@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import ListGroup from "./ListGroup";
 import { FaMapLocationDot } from "react-icons/fa6";
 import { PiPathBold } from "react-icons/pi";
+import { MdTimer } from "react-icons/md";
 import { LatLngExpression } from "leaflet";
 
 interface Props {
@@ -96,7 +97,7 @@ const OffScreen = ({
                 borderRadius: "5px",
               }}
             >
-              <PiPathBold />
+              <MdTimer />
               <h6 style={{ margin: 10 }}>
                 Execution Time:{" "}
                 {executionTime != null && numMarkers == 2
