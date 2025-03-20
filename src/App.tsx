@@ -66,6 +66,8 @@ function App() {
   const center: [number, number] = [29.622069801647613, -82.62269247880934];
   const [offScreenVisible, setOSVisibility] = useState(true);
 
+  const [executionTime, setExecutionTime] = useState<string | null>(null);
+
   // when there are two markers, find the shortest path
   useEffect(() => {
     if (markers.length === 2) {
@@ -82,8 +84,6 @@ function App() {
   }, [markers]);
 
   // make the function that finds the shortest path
-  const [executionTime, setExecutionTime] = useState<string | null>(null);
-
   const fetchShortestPath = async () => {
     const startTime = performance.now();
     // if no two markers, stop
@@ -91,6 +91,8 @@ function App() {
 
     //get the data request from python file
     try {
+      setShortestPath([]);
+      setExecutionTime("Loading...");
       const response = await fetch("http://127.0.0.1:5000/dijkstras", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
