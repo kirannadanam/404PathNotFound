@@ -8,7 +8,19 @@
   transition: 0.3s;
 }
 
+.list-group-item.active {
+  color: white;
+  border-color: #ffffff;
+  border-width: 1px !important;
+  outline: white; 
+  text-emphasis: bold !important;
+  font-weight: 600;
+}
 
+.list-group-item:focus {
+  box-shadow: none;
+  outline: none !important;
+}
 
 .btn-bracket::before,
 .btn-bracket::after {

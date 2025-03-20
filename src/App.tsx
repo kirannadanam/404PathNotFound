@@ -75,8 +75,17 @@ function App() {
     }
   }, [markers]);
 
+  const [numMarkers, setNumMarkers] = useState(markers.length);
+
+  useEffect(() => {
+    setNumMarkers(markers.length);
+  }, [markers]);
+
   // make the function that finds the shortest path
+  const [executionTime, setExecutionTime] = useState<string | null>(null);
+
   const fetchShortestPath = async () => {
+    const startTime = performance.now();
     // if no two markers, stop
     if (markers.length < 2) return;
 
@@ -88,6 +97,8 @@ function App() {
         body: JSON.stringify({ point1: markers[0], point2: markers[1] }),
       });
 
+      const endTime = performance.now();
+
       // set the shortest path to the given path
       const data = await response.json();
       console.log("Received Path from Flask:", data.path); // Debugging log
@@ -96,6 +107,7 @@ function App() {
         setShortestPath(data.path);
         markers[0] = data.path[0];
         markers[1] = data.path[data.path.length - 1];
+        setExecutionTime(((endTime - startTime) / 1000).toFixed(3));
       }
     } catch (error) {
       console.error("Error fetching shortest path:", error);
@@ -150,6 +162,8 @@ function App() {
             destination={[markers[1]]}
             start={[markers[0]]}
             onClose={() => setOSVisibility(false)}
+            executionTime={executionTime}
+            numMarkers={numMarkers}
           />
         ) : (
           <Button
