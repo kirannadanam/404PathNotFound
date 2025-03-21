@@ -136,22 +136,6 @@ const OffScreen = ({
                   : "N/A"}
               </h6>
             </div>
-
-            <div>
-              <img
-                src={pathNotFound ? "/404active.png" : "/404static.png"}
-                alt="404 Static Image"
-                style={{
-                  position: "fixed", // Fixes the image in place relative to the viewport
-                  top: "86%", // Position it at the center of the screen vertically
-                  left: "26%", // Position it at the center horizontally
-                  width: "210px", // Set the width of the image
-                  height: "250px", // Set the height of the image
-                  objectFit: "contain", // Keep the aspect ratio of the image
-                  transform: "translate(-50%, -50%)", // Offset by 50% of its own width and height to center it
-                }}
-              />
-            </div>
           </>
         </div>
       </div>

@@ -96,6 +96,7 @@ function App() {
     try {
       setShortestPath([]);
       setExecutionTime("Loading...");
+      setPathNotFound(false);
       const response = await fetch("http://127.0.0.1:5000/dijkstras", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -198,6 +199,22 @@ function App() {
             onClick={() => setOSVisibility(true)}
           ></Button>
         )}
+      </div>
+      <div>
+        <img
+          src={pathNotFound ? "/404active.png" : "/404static.png"}
+          alt="404 Static Image"
+          style={{
+            position: "fixed", // Fixes the image in place relative to the viewport
+            bottom: "2%",
+            right: "2%",
+            width: "105px",
+            height: "125px",
+            objectFit: "contain",
+            opacity: pathNotFound ? 1 : 0.5,
+            transition: "opacity 0.1s ease-in-out",
+          }}
+        />
       </div>
     </>
   );
