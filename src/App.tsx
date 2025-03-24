@@ -133,6 +133,8 @@ function App() {
     } else {
       setShortestPath([]);
       setPathNotFound(false);
+      setDestinationLocation("");
+      setStartLocation("");
     }
   }, [markers]);
 
