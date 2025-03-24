@@ -16,6 +16,7 @@ import {
   Rectangle,
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
+import "leaflet-control-geocoder";
 import { Icon, LatLngExpression } from "leaflet";
 
 function HandleClick({
@@ -39,6 +40,55 @@ function HandleClick({
     },
   });
   return null;
+}
+
+async function getNearestLocation(lat: number, lon: number): Promise<string> {
+  const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`;
+
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (data && data.display_name) {
+      return data.display_name;
+    } else {
+      return "Location Not Found";
+    }
+  } catch (error) {
+    console.error("Error finding location: ", error);
+    return "Error finding location";
+  }
+}
+
+function findDistance(path: LatLngExpression[]): number {
+  let sum = 0;
+  const R = 3958.8; //radius of earth in miles. if you want distance in other units, then change this to another unit.
+
+  for (let i = 0; i < path.length - 1; i++) {
+    const [lat1, lon1] = path[i] as [number, number];
+    const [lat2, lon2] = path[i + 1] as [number, number];
+
+    //below is the haversine function that will get the distance between two coordinates
+    // d = 2 * R * asin(sqrt(a))
+    // a = sin²(Δlat/2) + cos(lat1) * cos(lat2) * sin²(Δlong/2)
+
+    const lat1Rad = lat1 * (Math.PI / 180);
+    const lon1Rad = lon1 * (Math.PI / 180);
+    const lat2Rad = lat2 * (Math.PI / 180);
+    const lon2Rad = lon2 * (Math.PI / 180);
+
+    const diffLat = lat2Rad - lat1Rad;
+    const diffLon = lon2Rad - lon1Rad;
+
+    const a =
+      Math.sin(diffLat / 2) ** 2 +
+      Math.cos(lat1Rad) * Math.cos(lat2Rad) * Math.sin(diffLon / 2) ** 2;
+    const d = 2 * R * Math.asin(Math.sqrt(a));
+
+    sum += d;
+  }
+
+  return sum;
 }
 
 function App() {
@@ -67,8 +117,14 @@ function App() {
   const [offScreenVisible, setOSVisibility] = useState(true);
 
   const [executionTime, setExecutionTime] = useState<string | null>(null);
+  const [distance, setDistance] = useState<string | null>(null);
 
   const [pathNotFound, setPathNotFound] = useState(false);
+
+  const [destinationLocation, setDestinationLocation] = useState<string | null>(
+    null
+  );
+  const [startLocation, setStartLocation] = useState<string | null>(null);
 
   // when there are two markers, find the shortest path
   useEffect(() => {
@@ -96,7 +152,10 @@ function App() {
     try {
       setShortestPath([]);
       setExecutionTime("Loading...");
+      setDistance("Loading...");
       setPathNotFound(false);
+      setDestinationLocation("");
+      setStartLocation("");
       const response = await fetch("http://127.0.0.1:5000/dijkstras", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -113,15 +172,22 @@ function App() {
 
       // set the shortest path to the given path
       const data = await response.json();
-      console.log("Received Path from Flask:", data.path); // Debugging log
+      // console.log("Received Path from Flask:", data.path); // Debugging log
 
       if (data.path) {
         setShortestPath(data.path);
         markers[0] = data.path[0];
         markers[1] = data.path[data.path.length - 1];
         setExecutionTime(((endTime - startTime) / 1000).toFixed(3));
-        console.log(data.path);
-        console.log(data.path.length);
+        setDistance(findDistance(data.path).toFixed(1));
+        const [lat1, lon1] = markers[0] as [number, number];
+        const [lat2, lon2] = markers[1] as [number, number];
+        setStartLocation(await getNearestLocation(lat1, lon1));
+        console.log(startLocation);
+        setDestinationLocation(await getNearestLocation(lat2, lon2));
+        console.log(destinationLocation);
+        // console.log(data.path);
+        // console.log(data.path.length);
       }
     } catch (error) {
       console.error("Error fetching shortest path:", error);
@@ -192,6 +258,9 @@ function App() {
             numMarkers={numMarkers}
             lengthPath={shortestPath.length}
             pathNotFound={pathNotFound}
+            distance={distance}
+            startLocation={startLocation}
+            destinationLocation={destinationLocation}
           />
         ) : (
           <Button

@@ -5,6 +5,7 @@ import { PiPathBold } from "react-icons/pi";
 import { MdTimer } from "react-icons/md";
 import { GiPathDistance } from "react-icons/gi";
 import { LatLngExpression } from "leaflet";
+import { IoHome } from "react-icons/io5";
 
 interface Props {
   onClose: () => void;
@@ -14,6 +15,9 @@ interface Props {
   numMarkers: number;
   lengthPath: number | 0;
   pathNotFound: boolean;
+  distance: string | null;
+  startLocation: string | null;
+  destinationLocation: string | null;
 }
 
 const OffScreen = ({
@@ -24,6 +28,9 @@ const OffScreen = ({
   numMarkers,
   lengthPath,
   pathNotFound,
+  distance,
+  startLocation,
+  destinationLocation,
 }: Props) => {
   let methods = ["Dijkstra's", "BFS", "DFS"];
   const [selectedMethod, setSelectedMethod] = useState<string>("Dijkstra's");
@@ -71,9 +78,10 @@ const OffScreen = ({
                 borderRadius: "5px",
               }}
             >
-              <FaMapLocationDot />
+              <IoHome />
               <h6 style={{ margin: 10 }}>
-                Start Location: {start[0] ? `${start[0]}` : "N/A"}
+                Start Location:{" "}
+                {start[0] ? `${start[0]} ${startLocation}` : "N/A"}
               </h6>
             </div>
             <div
@@ -87,9 +95,12 @@ const OffScreen = ({
                 borderRadius: "5px",
               }}
             >
-              <PiPathBold />
+              <FaMapLocationDot />
               <h6 style={{ margin: 10 }}>
-                Destination: {destination[0] ? `${destination[0]}` : "N/A"}
+                Destination:{" "}
+                {destination[0]
+                  ? `${destination[0]} ${destinationLocation}`
+                  : "N/A"}
               </h6>
             </div>
             <div
@@ -133,6 +144,29 @@ const OffScreen = ({
                   ? `${lengthPath}`
                   : lengthPath === 0 && numMarkers == 2
                   ? "Loading..."
+                  : "N/A"}
+              </h6>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                border: "4px solid white",
+                marginTop: "10px",
+                background: "#212529",
+                borderRadius: "5px",
+              }}
+            >
+              <PiPathBold />
+              <h6 style={{ margin: 10 }}>
+                Distance:{" "}
+                {pathNotFound
+                  ? "404: Path Not Found!"
+                  : distance === "Loading..." && numMarkers == 2
+                  ? `${distance}`
+                  : distance != null && numMarkers == 2
+                  ? `${distance} Miles`
                   : "N/A"}
               </h6>
             </div>
