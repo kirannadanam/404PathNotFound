@@ -48,7 +48,10 @@ const OffScreen = ({
         aria-labelledby="offcanvasLabel"
         style={{ height: "100vh", display: "flex", flexDirection: "column" }}
       >
-        <div className="offcanvas-header">
+        <div
+          className="offcanvas-header"
+          style={{ fontSize: "14px", padding: "2px 16px" }}
+        >
           <h3 className="offcanvas-title text-light" id="offcanvasLabel">
             404: Path Not Found!
           </h3>
@@ -78,10 +81,24 @@ const OffScreen = ({
                 borderRadius: "5px",
               }}
             >
-              <IoHome />
-              <h6 style={{ margin: 10 }}>
-                Start Location:{" "}
-                {start[0] ? `${start[0]} ${startLocation}` : "N/A"}
+              <IoHome
+                style={{
+                  width: "20px",
+                  height: "20px",
+                  flexShrink: 0,
+                }}
+              />
+              <h6 style={{ margin: 10, fontSize: "14px" }}>
+                {startLocation !== "" ? (
+                  <>
+                    <b>Start Location: </b>
+                    {start[0] ? startLocation : "N/A"}
+                    <br />
+                  </>
+                ) : (
+                  ""
+                )}
+                <b>Start:</b> {start[0] ? `${start[0]}` : "N/A"}
               </h6>
             </div>
             <div
@@ -95,12 +112,25 @@ const OffScreen = ({
                 borderRadius: "5px",
               }}
             >
-              <FaMapLocationDot />
-              <h6 style={{ margin: 10 }}>
-                Destination:{" "}
-                {destination[0]
-                  ? `${destination[0]} ${destinationLocation}`
-                  : "N/A"}
+              <FaMapLocationDot
+                style={{
+                  width: "20px",
+                  height: "20px",
+                  flexShrink: 0,
+                }}
+              />
+              <h6 style={{ margin: 10, fontSize: "14px" }}>
+                {destinationLocation !== "" ? (
+                  <>
+                    <b>Destination Location:</b>{" "}
+                    {destination[0] ? destinationLocation : "N/A"}
+                    <br />
+                  </>
+                ) : (
+                  ""
+                )}
+                <b>Destination:</b>{" "}
+                {destination[0] ? `${destination[0]}` : "N/A"}
               </h6>
             </div>
             <div
@@ -114,9 +144,15 @@ const OffScreen = ({
                 borderRadius: "5px",
               }}
             >
-              <MdTimer />
+              <MdTimer
+                style={{
+                  width: "20px",
+                  height: "20px",
+                  flexShrink: 0,
+                }}
+              />
               <h6 style={{ margin: 10 }}>
-                Execution Time:{" "}
+                <b>Execution Time:</b>{" "}
                 {pathNotFound
                   ? "404: Path Not Found!"
                   : executionTime != null && numMarkers == 2
@@ -135,9 +171,15 @@ const OffScreen = ({
                 borderRadius: "5px",
               }}
             >
-              <GiPathDistance />
+              <GiPathDistance
+                style={{
+                  width: "20px",
+                  height: "20px",
+                  flexShrink: 0,
+                }}
+              />
               <h6 style={{ margin: 10 }}>
-                Nodes Traveled in Path:{" "}
+                <b>Nodes Traveled in Path:</b>{" "}
                 {pathNotFound
                   ? "404 ERROR!!!"
                   : lengthPath != 0 && numMarkers == 2
@@ -158,9 +200,15 @@ const OffScreen = ({
                 borderRadius: "5px",
               }}
             >
-              <PiPathBold />
+              <PiPathBold
+                style={{
+                  width: "20px",
+                  height: "20px",
+                  flexShrink: 0,
+                }}
+              />
               <h6 style={{ margin: 10 }}>
-                Distance:{" "}
+                <b>Distance:</b>{" "}
                 {pathNotFound
                   ? "404: Path Not Found!"
                   : distance === "Loading..." && numMarkers == 2

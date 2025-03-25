@@ -128,14 +128,26 @@ function App() {
 
   // when there are two markers, find the shortest path
   useEffect(() => {
-    if (markers.length === 2) {
-      fetchShortestPath();
-    } else {
-      setShortestPath([]);
-      setPathNotFound(false);
-      setDestinationLocation("");
-      setStartLocation("");
-    }
+    const fetchData = async () => {
+      if (markers.length === 2) {
+        fetchShortestPath();
+      } else {
+        setShortestPath([]);
+        setPathNotFound(false);
+        if (!markers[0]) {
+          setStartLocation("");
+        }
+        if (!markers[1]) {
+          setDestinationLocation("");
+        }
+        if (markers[0]) {
+          const [lat1, lon1] = markers[0] as [number, number];
+          setStartLocation(await getNearestLocation(lat1, lon1));
+          console.log(startLocation);
+        }
+      }
+    };
+    fetchData();
   }, [markers]);
 
   const [numMarkers, setNumMarkers] = useState(markers.length);
@@ -148,16 +160,22 @@ function App() {
   const fetchShortestPath = async () => {
     const startTime = performance.now();
     // if no two markers, stop
-    if (markers.length < 2) return;
-
+    if (markers.length < 2) {
+      return;
+    }
     //get the data request from python file
     try {
       setShortestPath([]);
       setExecutionTime("Loading...");
       setDistance("Loading...");
       setPathNotFound(false);
-      setDestinationLocation("");
-      setStartLocation("");
+
+      if (markers[1]) {
+        const [lat2, lon2] = markers[1] as [number, number];
+        setDestinationLocation(await getNearestLocation(lat2, lon2));
+        console.log(destinationLocation);
+      }
+
       const response = await fetch("http://127.0.0.1:5000/dijkstras", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -182,12 +200,6 @@ function App() {
         markers[1] = data.path[data.path.length - 1];
         setExecutionTime(((endTime - startTime) / 1000).toFixed(3));
         setDistance(findDistance(data.path).toFixed(1));
-        const [lat1, lon1] = markers[0] as [number, number];
-        const [lat2, lon2] = markers[1] as [number, number];
-        setStartLocation(await getNearestLocation(lat1, lon1));
-        console.log(startLocation);
-        setDestinationLocation(await getNearestLocation(lat2, lon2));
-        console.log(destinationLocation);
         // console.log(data.path);
         // console.log(data.path.length);
       }
