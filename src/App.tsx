@@ -97,7 +97,7 @@ function App() {
   const [shortestPath, setShortestPath] = useState<LatLngExpression[]>([]);
 
   const searchBounds: [[number, number], [number, number]] = [
-    [29.204, -83.104], // SW
+    [29.204, -83.10486], // SW
     [30.048, -81.605], // NE corner (lat, lon)
   ];
 
