@@ -319,5 +319,6 @@ def dijkstras():
     #the original method uses O(N^2) where N is the number of nodes because of curr_node = min(unvisited, node: distances)
     #the new one is much faster in that regard. With the first method 1 million nodes would take 1 trillion operations. Not happening.
 if __name__ == "__main__":
+    print("flask server starting up")
     port = int(os.environ.get('PORT', 10000)) #set the port for the online backend (not local host)
     app.run(host='0.0.0.0', port=port)
