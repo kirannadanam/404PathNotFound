@@ -35,6 +35,8 @@ const OffScreen = ({
   let methods = ["Dijkstra's", "BFS", "DFS"];
   const [selectedMethod, setSelectedMethod] = useState<string>("Dijkstra's");
 
+  if (selectedMethod) {
+  }
   const handleSelectItem = (item: string) => {
     setSelectedMethod(item);
   };
