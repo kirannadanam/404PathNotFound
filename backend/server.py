@@ -327,6 +327,5 @@ def dijkstras():
     #the new one is much faster in that regard. With the first method 1 million nodes would take 1 trillion operations. Not happening.
 if __name__ == "__main__":
     print("flask server starting up")
-    # port = int(os.environ.get('PORT', 10000)) #set the port for the online backend (not local host)
-    # app.run(host='0.0.0.0', port=port)
-    app.run(host='0.0.0.0', port=5000)
+    port = int(os.environ.get("PORT", 10000))  # Default to 5000 if no PORT is set
+    app.run(host="0.0.0.0", port=port)
