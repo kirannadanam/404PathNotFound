@@ -73,7 +73,7 @@ import os
 
 
 # Load the road gainesville shapefile
-gainesville_shapefile_path = os.path.join(os.path.dirname(__file__), 'public', 'Gainesville', 'BetterGainesville.shp')
+gainesville_shapefile_path = "./public/Gainesville/BetterGainesville.shp"
 gdf = gpd.read_file(gainesville_shapefile_path)
 
 
