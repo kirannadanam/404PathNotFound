@@ -71,10 +71,15 @@ print("connection established")
 
 import os
 
+print("Working directory:", os.getcwd())
 
 # Load the road gainesville shapefile
 gainesville_shapefile_path = "./public/Gainesville/BetterGainesville.shp"
+
+print("Trying to load shapefile from:", gainesville_shapefile_path)
 gdf = gpd.read_file(gainesville_shapefile_path)
+
+print("finished loading the shapefile from that path")
 
 
 # Load the road south florida shapefiles
